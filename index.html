@@ -29,7 +29,7 @@ body{
 }
 .slide.active{
   opacity:1;
-  transform:scale(1.12); /* ZOOM */
+  transform:scale(1.12);
 }
 
 /* OVERLAY */
@@ -57,22 +57,11 @@ body{
   margin-left:4px;
   animation:blink 1s infinite;
 }
-
-/* SMALL TEXT */
 .small{
   margin-top:14px;
   font-family:'Dancing Script',cursive;
   font-size:22px;
   opacity:.9;
-}
-
-/* HINT */
-.hint{
-  position:absolute;
-  bottom:36px;
-  right:36px;
-  font-size:14px;
-  opacity:.7;
 }
 
 /* START */
@@ -86,8 +75,29 @@ body{
   align-items:center;
   flex-direction:column;
   cursor:pointer;
+  z-index:20;
 }
-.start h1{font-size:36px}
+
+/* NEXT BUTTON */
+.next-btn{
+  position:fixed;
+  right:20px;
+  top:50%;
+  transform:translateY(-50%);
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.85);
+  color:black;
+  font-size:22px;
+  font-weight:900;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  z-index:10;
+  box-shadow:0 6px 20px rgba(0,0,0,.25);
+}
 
 /* RAIN */
 .rain{
@@ -100,6 +110,7 @@ body{
 @keyframes fall{
   to{transform:translateY(110vh);opacity:0;}
 }
+@keyframes blink{50%{opacity:0;}}
 
 /* CREDIT */
 .credit{
@@ -111,9 +122,6 @@ body{
   color:white;
   opacity:.6;
 }
-@keyframes blink{
-  50%{opacity:0;}
-}
 </style>
 </head>
 
@@ -122,45 +130,41 @@ body{
 <!-- START -->
 <div class="start" id="start">
   <h1>Tap untuk mulai</h1>
-  <p style="opacity:.7">Cerita seseorang yang kangen banget…</p>
+  <p style="opacity:.7">Cerita seseorang yang lagi kangen banget…</p>
 </div>
 
 <!-- SLIDES -->
 <div class="slide active" data-text="Awalnya aku kira ini cuma rindu biasa…" data-small="ternyata salah besar." style="background-image:url('img1.jpg')">
   <div class="overlay"></div>
   <div class="text"></div>
-  <div class="hint">Klik / Swipe ➜</div>
 </div>
 
-<div class="slide" data-text="Setiap lihat foto ini, aku senyum sendiri." data-small="kayak orang aneh, tapi bahagia." style="background-image:url('img2.jpg')">
-  <div class="overlay"></div>
-  <div class="text"></div>
-  <div class="hint">Klik / Swipe ➜</div>
-</div>
-
-<div class="slide" data-text="Aku kangen kamu." data-small="yang berisik, nyebelin, tapi bikin nyaman." style="background-image:url('img3.jpg')">
-  <div class="overlay"></div>
-  <div class="text"></div>
-  <div class="hint">Klik / Swipe ➜</div>
-</div>
-
-<div class="slide" data-text="Kadang aku mikir…" data-small="apa kamu sadar ada yang sekangen ini?" style="background-image:url('img4.jpg')">
-  <div class="overlay"></div>
-  <div class="text"></div>
-  <div class="hint">Klik / Swipe ➜</div>
-</div>
-
-<div class="slide" data-text="Kalau rindu bisa jalan," data-small="mungkin dia udah nyampe ke kamu." style="background-image:url('img5.jpg')">
-  <div class="overlay"></div>
-  <div class="text"></div>
-  <div class="hint">Klik / Swipe ➜</div>
-</div>
-
-<div class="slide" data-text="Jadi aku cuma mau bilang…" data-small="aku kangen. banget." style="background-image:url('img6.jpg')">
+<div class="slide" data-text="Setiap lihat foto ini, aku senyum sendiri." data-small="karena isinya kamu, Syifa Rahmadani." style="background-image:url('img2.jpg')">
   <div class="overlay"></div>
   <div class="text"></div>
 </div>
 
+<div class="slide" data-text="Aku kangen kamu." data-small="kangen yang gak bisa dijelasin." style="background-image:url('img3.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+</div>
+
+<div class="slide" data-text="Kalau rindu ini ada suaranya…" data-small="mungkin isinya namamu terus." style="background-image:url('img4.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+</div>
+
+<div class="slide" data-text="Dan kalau kamu ngerasa tiba-tiba hangat…" data-small="mungkin aku lagi kangen banget." style="background-image:url('img5.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+</div>
+
+<div class="slide" data-text="Miss You So Much ❤️" data-small="Syifa Rahmadani" style="background-image:url('img6.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+</div>
+
+<div class="next-btn" id="nextBtn">▶</div>
 <div class="credit">Dev by Tuan Muda R</div>
 
 <audio id="music" src="music.mp3" loop></audio>
@@ -169,6 +173,7 @@ body{
 const slides = document.querySelectorAll(".slide");
 const start = document.getElementById("start");
 const music = document.getElementById("music");
+const nextBtn = document.getElementById("nextBtn");
 
 let index = 0;
 let typing = false;
@@ -184,8 +189,7 @@ function typeText(el, text, small){
 
   const interval = setInterval(()=>{
     if(i < text.length){
-      cursor.insertAdjacentText("beforebegin", text[i]);
-      i++;
+      cursor.insertAdjacentText("beforebegin", text[i++]);
     }else{
       clearInterval(interval);
       cursor.remove();
@@ -200,52 +204,47 @@ function typeText(el, text, small){
   },45);
 }
 
-/* SHOW SLIDE */
 function showSlide(i){
   slides.forEach(s=>s.classList.remove("active"));
   const slide = slides[i];
   slide.classList.add("active");
-
-  const textEl = slide.querySelector(".text");
-  const t = slide.dataset.text;
-  const s = slide.dataset.small;
-  typeText(textEl, t, s);
+  typeText(slide.querySelector(".text"), slide.dataset.text, slide.dataset.small);
 }
 
-/* NEXT */
 function next(){
   if(typing) return;
   if(index < slides.length-1){
     index++;
     showSlide(index);
+  }else{
+    nextBtn.style.display="none";
   }
 }
 
 /* START */
 start.addEventListener("click", ()=>{
   start.style.display="none";
-  music.play().catch(()=>{});
+  music.currentTime = 0;
+  music.volume = 0.9;
+  music.play();
   showSlide(0);
 });
 
-/* CLICK */
-document.body.addEventListener("click", ()=>{
-  if(start.style.display !== "none") return;
-  next();
-});
+/* CLICK / BUTTON */
+document.body.addEventListener("click", ()=> start.style.display==="none" && next());
+nextBtn.addEventListener("click", e=>{e.stopPropagation(); next();});
 
 /* SWIPE */
-let startX = 0;
-document.addEventListener("touchstart", e=>startX = e.touches[0].clientX);
+let startX=0;
+document.addEventListener("touchstart", e=>startX=e.touches[0].clientX);
 document.addEventListener("touchend", e=>{
-  const dx = startX - e.changedTouches[0].clientX;
-  if(dx > 50) next();
+  if(startX - e.changedTouches[0].clientX > 50) next();
 });
 
 /* RAIN */
-const rainEmoji = ["✨","⭐","💖","💫"];
+const rainEmoji=["✨","⭐","💖","💫"];
 setInterval(()=>{
-  const r = document.createElement("div");
+  const r=document.createElement("div");
   r.className="rain";
   r.innerText=rainEmoji[Math.floor(Math.random()*rainEmoji.length)];
   r.style.left=Math.random()*100+"vw";
