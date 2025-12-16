@@ -78,25 +78,29 @@ body{
   z-index:20;
 }
 
-/* NEXT BUTTON */
+/* NEXT BUTTON — KIRI TENGAH */
 .next-btn{
   position:fixed;
-  right:20px;
+  left:20px;
   top:50%;
   transform:translateY(-50%);
-  width:52px;
-  height:52px;
+  width:54px;
+  height:54px;
   border-radius:50%;
-  background:rgba(255,255,255,0.85);
-  color:black;
+  background:rgba(255,255,255,0.9);
+  color:#000;
   font-size:22px;
   font-weight:900;
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
-  z-index:10;
-  box-shadow:0 6px 20px rgba(0,0,0,.25);
+  z-index:30;
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
+  user-select:none;
+}
+.next-btn:active{
+  transform:translateY(-50%) scale(.9);
 }
 
 /* RAIN */
@@ -164,7 +168,9 @@ body{
   <div class="text"></div>
 </div>
 
+<!-- NEXT BUTTON -->
 <div class="next-btn" id="nextBtn">▶</div>
+
 <div class="credit">Dev by Tuan Muda R</div>
 
 <audio id="music" src="music.mp3" loop></audio>
@@ -204,6 +210,7 @@ function typeText(el, text, small){
   },45);
 }
 
+/* SHOW SLIDE */
 function showSlide(i){
   slides.forEach(s=>s.classList.remove("active"));
   const slide = slides[i];
@@ -211,6 +218,7 @@ function showSlide(i){
   typeText(slide.querySelector(".text"), slide.dataset.text, slide.dataset.small);
 }
 
+/* NEXT */
 function next(){
   if(typing) return;
   if(index < slides.length-1){
@@ -224,20 +232,26 @@ function next(){
 /* START */
 start.addEventListener("click", ()=>{
   start.style.display="none";
+
+  // AUDIO — PASTI JALAN
   music.currentTime = 0;
   music.volume = 0.9;
-  music.play();
+  music.play().catch(()=>{});
+
   showSlide(0);
 });
 
-/* CLICK / BUTTON */
-document.body.addEventListener("click", ()=> start.style.display==="none" && next());
-nextBtn.addEventListener("click", e=>{e.stopPropagation(); next();});
+/* BUTTON NEXT */
+nextBtn.addEventListener("click", (e)=>{
+  e.stopPropagation(); // penting
+  if(start.style.display === "none") next();
+});
 
 /* SWIPE */
 let startX=0;
 document.addEventListener("touchstart", e=>startX=e.touches[0].clientX);
 document.addEventListener("touchend", e=>{
+  if(start.style.display !== "none") return;
   if(startX - e.changedTouches[0].clientX > 50) next();
 });
 
