@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Miss You</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  height:100vh;
+  background:black;
+  font-family:'Poppins',sans-serif;
+  overflow:hidden;
+}
+
+/* SLIDE */
+.slide{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:center;
+  opacity:0;
+  transform:scale(1);
+  transition:opacity 1.2s ease, transform 8s linear;
+}
+.slide.active{
+  opacity:1;
+  transform:scale(1.12); /* ZOOM */
+}
+
+/* OVERLAY */
+.overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to top, rgba(0,0,0,.65), rgba(0,0,0,.15));
+}
+
+/* TEXT */
+.text{
+  position:absolute;
+  bottom:18%;
+  left:8%;
+  max-width:80%;
+  color:white;
+  font-size:28px;
+  line-height:1.35;
+}
+.cursor{
+  display:inline-block;
+  width:2px;
+  height:28px;
+  background:white;
+  margin-left:4px;
+  animation:blink 1s infinite;
+}
+
+/* SMALL TEXT */
+.small{
+  margin-top:14px;
+  font-family:'Dancing Script',cursive;
+  font-size:22px;
+  opacity:.9;
+}
+
+/* HINT */
+.hint{
+  position:absolute;
+  bottom:36px;
+  right:36px;
+  font-size:14px;
+  opacity:.7;
+}
+
+/* START */
+.start{
+  position:absolute;
+  inset:0;
+  background:black;
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  cursor:pointer;
+}
+.start h1{font-size:36px}
+
+/* RAIN */
+.rain{
+  position:fixed;
+  top:-20px;
+  font-size:16px;
+  opacity:.7;
+  animation:fall linear forwards;
+}
+@keyframes fall{
+  to{transform:translateY(110vh);opacity:0;}
+}
+
+/* CREDIT */
+.credit{
+  position:fixed;
+  bottom:12px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:12px;
+  color:white;
+  opacity:.6;
+}
+@keyframes blink{
+  50%{opacity:0;}
+}
+</style>
+</head>
+
+<body>
+
+<!-- START -->
+<div class="start" id="start">
+  <h1>Tap untuk mulai</h1>
+  <p style="opacity:.7">Cerita seseorang yang kangen banget…</p>
+</div>
+
+<!-- SLIDES -->
+<div class="slide active" data-text="Awalnya aku kira ini cuma rindu biasa…" data-small="ternyata salah besar." style="background-image:url('img1.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+  <div class="hint">Klik / Swipe ➜</div>
+</div>
+
+<div class="slide" data-text="Setiap lihat foto ini, aku senyum sendiri." data-small="kayak orang aneh, tapi bahagia." style="background-image:url('img2.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+  <div class="hint">Klik / Swipe ➜</div>
+</div>
+
+<div class="slide" data-text="Aku kangen kamu." data-small="yang berisik, nyebelin, tapi bikin nyaman." style="background-image:url('img3.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+  <div class="hint">Klik / Swipe ➜</div>
+</div>
+
+<div class="slide" data-text="Kadang aku mikir…" data-small="apa kamu sadar ada yang sekangen ini?" style="background-image:url('img4.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+  <div class="hint">Klik / Swipe ➜</div>
+</div>
+
+<div class="slide" data-text="Kalau rindu bisa jalan," data-small="mungkin dia udah nyampe ke kamu." style="background-image:url('img5.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+  <div class="hint">Klik / Swipe ➜</div>
+</div>
+
+<div class="slide" data-text="Jadi aku cuma mau bilang…" data-small="aku kangen. banget." style="background-image:url('img6.jpg')">
+  <div class="overlay"></div>
+  <div class="text"></div>
+</div>
+
+<div class="credit">Dev by Tuan Muda R</div>
+
+<audio id="music" src="music.mp3" loop></audio>
+
+<script>
+const slides = document.querySelectorAll(".slide");
+const start = document.getElementById("start");
+const music = document.getElementById("music");
+
+let index = 0;
+let typing = false;
+
+/* TYPEWRITER */
+function typeText(el, text, small){
+  typing = true;
+  el.innerHTML = "";
+  let i = 0;
+  const cursor = document.createElement("span");
+  cursor.className = "cursor";
+  el.appendChild(cursor);
+
+  const interval = setInterval(()=>{
+    if(i < text.length){
+      cursor.insertAdjacentText("beforebegin", text[i]);
+      i++;
+    }else{
+      clearInterval(interval);
+      cursor.remove();
+      if(small){
+        const s = document.createElement("div");
+        s.className = "small";
+        s.innerText = small;
+        el.appendChild(s);
+      }
+      typing = false;
+    }
+  },45);
+}
+
+/* SHOW SLIDE */
+function showSlide(i){
+  slides.forEach(s=>s.classList.remove("active"));
+  const slide = slides[i];
+  slide.classList.add("active");
+
+  const textEl = slide.querySelector(".text");
+  const t = slide.dataset.text;
+  const s = slide.dataset.small;
+  typeText(textEl, t, s);
+}
+
+/* NEXT */
+function next(){
+  if(typing) return;
+  if(index < slides.length-1){
+    index++;
+    showSlide(index);
+  }
+}
+
+/* START */
+start.addEventListener("click", ()=>{
+  start.style.display="none";
+  music.play().catch(()=>{});
+  showSlide(0);
+});
+
+/* CLICK */
+document.body.addEventListener("click", ()=>{
+  if(start.style.display !== "none") return;
+  next();
+});
+
+/* SWIPE */
+let startX = 0;
+document.addEventListener("touchstart", e=>startX = e.touches[0].clientX);
+document.addEventListener("touchend", e=>{
+  const dx = startX - e.changedTouches[0].clientX;
+  if(dx > 50) next();
+});
+
+/* RAIN */
+const rainEmoji = ["✨","⭐","💖","💫"];
+setInterval(()=>{
+  const r = document.createElement("div");
+  r.className="rain";
+  r.innerText=rainEmoji[Math.floor(Math.random()*rainEmoji.length)];
+  r.style.left=Math.random()*100+"vw";
+  r.style.animationDuration=(4+Math.random()*3)+"s";
+  document.body.appendChild(r);
+  setTimeout(()=>r.remove(),7000);
+},300);
+</script>
+
+</body>
+</html>
